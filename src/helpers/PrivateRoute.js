@@ -1,11 +1,18 @@
 import React from "react";
-import { useKeycloak } from "@react-keycloak/web";
+import {useKeycloak} from "@react-keycloak/web";
 
-const PrivateRoute = ({ children }) => {
-    const { keycloak } = useKeycloak();
-    const isLoggedIn = keycloak.authenticated;
+const PrivateRoute = ({children, roles}) => {
+    const {keycloak} = useKeycloak();
 
-    return isLoggedIn ? children : <div>Access Denied</div>;
+    if (!keycloak.authenticated) {
+        return <div>Access Denied</div>;
+    }
+
+    if (roles && !roles.some((role) => keycloak.hasRealmRole(role))) {
+        return <div>Access Denied</div>;
+    }
+
+    return children;
 };
 
 export default PrivateRoute;
